@@ -11,11 +11,11 @@
         <ul class="navbar-nav "
             v-bind:class="[showCenterClass ? 'abs-center-x' : '']">
              <li class="nav-item ">
-                <router-link class="nav-link" to="/" active-class="active" exact>Home</router-link>
+                <router-link class="nav-link" to="/" active-class="active"  exact>{{t('home')}}</router-link>
             </li>
         
             <li class="nav-item">
-                <router-link class="nav-link" to="/posts" active-class="active">posts</router-link>
+                <router-link class="nav-link" to="/posts" active-class="active">{{t('posts')}}</router-link>
 
             </li>
             <li v-show="isLoggedIn" class="nav-item dropdown">
@@ -26,9 +26,6 @@
                 <router-link class="dropdown-item" to="/create-post" active-class="active">create post</router-link>
                 <router-link class="dropdown-item" to="/posts-manage" >manage posts</router-link>
 
-                <a class="dropdown-item" href="#">Another action</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Something else here</a>
               </div>
             </li>
 

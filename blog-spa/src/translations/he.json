@@ -4,6 +4,20 @@
     "register":"הרשמה",
     "email":"אימייל",
     "posts":"פוסטים",
-    "home":"דף הבית"
+    "home":"דף הבית",
+    "edit":"עריכה",
+    "add":"הוספה",
+    "shortdesc":"תיאור קצר",
+    "enter":"כניסה",
+    "title":"כותרת",
+    "excerpt":"תיאור קצר",
+    "content":"תוכן",
+    "update":"עדכן",
+    "upload":"העלה קובץ",
+    "read":"קרא עוד",
+    "password":"סיסמה",
+    "confirmpassword":"וידוא סיסמה",
+    "firstname":"שם פרטי",
+    "lastname":"שם משפחה"
 }
 

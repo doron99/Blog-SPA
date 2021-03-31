@@ -6,32 +6,51 @@
 <table style="margin: 0px auto;">
     <tr>
         <th>id</th>
-        <th>שגכעיגכ</th>
-        <th>enter</th>
-        <th>edit</th>
+        <th>{{t('shortdesc')}}</th>
+        <th>{{t('enter')}}</th>
+        <th>{{t('edit')}}</th>
     </tr>
         
         <tr v-for="post in posts" :key="post">
         <td data-th="id">{{post.title}}</td>
-        <td data-th="שגכעיגכ">{{post.excerpt}}</td>
-        <td data-th="enter"><router-link :to="'/posts/'+post.postId" class="btn btn-success d-inline">enter</router-link></td>
-        <td data-th="edit"><router-link :to="'/create-post/'+post.postId" class="btn btn-info d-inline">edit</router-link></td>
+        <td :data-th="t('shortdesc')">{{post.excerpt}}</td>
+        <td :data-th="t('enter')"><router-link :to="'/posts/'+post.postId" class="btn btn-success d-inline">{{t('enter')}}</router-link></td>
+        <td :data-th="t('edit')"><router-link :to="'/create-post/'+post.postId" class="btn btn-info d-inline">{{t('edit')}}</router-link></td>
         </tr>
     </table>
+
+<div class="d-flex justify-content-center mt-3 mb-3">
+                <pagination  
+                    :totalPages="totalPages"
+                    :currPage="currPage"
+                    :maxVisibleButtons="maxVisibleButtons"
+                    @pagechanged="onPageChange($event)">
+                </pagination>
+        </div>
 </div>
+
+
     
 </template>
 <script>
+      import Pagination from '../General/Pagination'
       import {useI18n} from 'vue-i18n'
       import _service from '../../_services/_service'
     export default{
+        components:{
+            Pagination
+        },
          setup(){
           const {t,locale} = useI18n();
           return  {t,locale} 
         },
         data(){
             return{
-                posts:[]
+                posts:[],
+                currPage:null,
+                itemsPerPage:null,
+                TotalPages:1,
+                maxVisibleButtons:3,
             }
         },
         created(){
@@ -40,21 +59,34 @@
             //     return  process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
         },
         mounted(){
-            this.$store.commit('setLoading',true)
-
-            _service.getPosts()
-            .then(res => {
-              this.posts = res.data; 
-              console.log(this.posts);
-
-
-            }).catch(err => {
-              console.log(err)
-            }).then(() => {
-                this.$store.commit('setLoading',false)
-            })
+            this.getPosts()
         },
         methods:{
+            getPosts(){
+              let data = {
+                currPage:this.currPage,
+                itemsPerPage:this.itemsPerPage
+              }
+              this.$store.commit('setLoading',true)
+              _service.getPosts(data)
+              .then(res => {
+                this.posts = res.data.data; 
+                this.currPage = res.data.currPage;
+                this.itemsPerPage = res.data.itemsPerPage;
+                this.totalPages = res.data.totalPages;
+                console.log(this.posts);
+              }).catch(err => {
+                console.log(err)
+              }).then(() => {
+                  this.$store.commit('setLoading',false)
+              })
+          },
+          onPageChange(event){
+                this.currPage=event
+                console.log('res:',event,this.itemsPerPage)
+                this.$router.push(`/posts-manage?currPage=${this.currPage}&itemsPerPage=${this.itemsPerPage}`)
+                this.getPosts()
+            },
           getImg(img){
             return process.env.VUE_APP_ROOT_URL + '/data/posts/' + img
           }

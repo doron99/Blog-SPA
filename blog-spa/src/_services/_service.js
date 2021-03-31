@@ -15,8 +15,10 @@ export default {
     return axios.post('/auth/login',formData);
   },
 
-  getPosts() {
-    return axios.get('/posts');
+  getPosts(data) {
+    return axios.get('/posts',{
+      params: data
+    });
   },
   async getPost(id) {
     return await axios.get(`/posts/${id}`,{},{ headers:  { 'Authorization': `Bearer ${localStorage.getItem('token')}`}});

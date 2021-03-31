@@ -2,20 +2,20 @@
 <div class="container text-right" style="direction:rtl;">
  <div class="card"  >
              <div class="card-body">
-                <h5 class="card-title">{{post.postId? 'Edit' : 'Add'}} Post</h5>
+                <h5 class="card-title">{{post.postId? t('edit') : t('add')}}</h5>
                 <div class="row">
                     <!-- //main div -->
                     <div class="col-sm-12">
                         
                         <div class="form-inline mb-2">
-                            Title <input  class="form-control form-control-sm w-50" v-model="post.title" />
+                            {{t('title')}} <input  class="form-control form-control-sm w-50" v-model="post.title" />
                         </div>
                         <div class="form-inline mb-2">
-                            Excerpt <input class="form-control form-control-sm w-50" v-model="post.excerpt" />
+                            {{t('excerpt')}} <input class="form-control form-control-sm w-50" v-model="post.excerpt" />
                         </div>
                        
                         <div class="form-group">
-                            <label for="content">Content</label>
+                            <label for="content">{{t('content')}}</label>
                             <br/>
                         <ckeditor 
                             :editor="editor" 
@@ -29,12 +29,12 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <img v-if="img" class="img-fluid rounded imagePreviewWrapper float-right"  :src="img || ''" alt="">
+                        <img v-if="!!post.coverImagePath" class="img-fluid rounded imagePreviewWrapper float-right"  :src="img || ''" alt="">
                     </div>
                 </div>
              </div>
              <div class="card-footer">
-                 <button @click.prevent="isUpdate? Update() :Create()">{{isUpdate? 'Update' : 'Create'}}</button>
+                 <button @click.prevent="isUpdate? Update() :Create()">{{isUpdate? t('update') : t('add')}}</button>
              </div>
         </div>
         <div class="mt-4">
@@ -42,7 +42,7 @@
                 ref="fileInput"
                 type="file"
                 @input="pickFile">
-                <button @click="Upload()">Upload</button>
+                <button @click="Upload()">{{t('upload')}}</button>
              <div
                 class="imagePreviewWrapper"
                 :style="{ 'background-image': `url(${previewImage})` }"
@@ -64,6 +64,10 @@
    import DocumentEditor from '@ckeditor/ckeditor5-build-decoupled-document';
     import _service from '../../_services/_service'
     export default{
+        setup(){
+          const {t,locale} = useI18n();
+          return  {t,locale} 
+        },
         data(){
             return{
                 editor: DocumentEditor,
@@ -137,20 +141,24 @@
                },
             }
         },
+        created(){
+            console.log('created')
+        },
         mounted(){
             this.editor.contentsLangDirection = 'rtl';
-            console.log('post id: ' + this.$route.params.id)
             if(!isNaN(this.$route.params.id)){
                 this.isUpdate = true;
-                this.getPost();
+                this.getPost(this.$route.params.id);
             }
+            console.log('mounted')
         },
         methods:{
             Create(){
                 _service.createPost(this.post)
                 .then(res => {
                     this.$toast.success('message string');
-                    this.$router.push(`/create-post/${res.data.postId}`);
+                    this.$router.push({ path: `/create-post/${res.data.postId}` }) 
+                    this.getPost(res.data.postId);
                 
                 }).catch(err => {
                     this.$toast.error('message string');
@@ -177,12 +185,11 @@
                 editor.execute( 'alignment', { value: 'right' } );
 
             },
-            async getPost(){
+            async getPost(id){
                 this.$store.commit('setLoading',true)
-
-                await _service.getPost(this.$route.params.id)
+                //let self = this;
+                await _service.getPost(id)
                 .then(res => {
-                    console.log(res.data);
                     this.post.postId=res.data.postId
                     this.post.title=res.data.title
                     this.post.excerpt=res.data.excerpt
@@ -190,7 +197,6 @@
                     this.post.created=res.data.created
                     this.post.coverImagePath=res.data.coverImagePath
                     this.img = process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
-
                 }).catch(err => {
                     console.log(err);
 
@@ -218,6 +224,7 @@
                 formData.append('image', this.$refs.fileInput.files[0]);
 
                 if (file && file[0]) {
+                    this.$store.commit('setLoading',true)
                     _service.upload(this.post.postId,formData )
                     .then(res => {
                         console.log(res.data);
@@ -225,7 +232,7 @@
                     }).catch(err =>{
                         console.log(err);
                         this.$toast.error('upload failed');
-                    })
+                    }).then(() => this.$store.commit('setLoading',false))
                 }
             }
         }

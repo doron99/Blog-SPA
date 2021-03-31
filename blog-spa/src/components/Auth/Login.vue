@@ -5,14 +5,14 @@
         <div class="form-group">
             <input type="text" 
             class="form-control" 
-            placeholder="Username" 
+            :placeholder="t('email')"
             v-model="email"
             required="required">
         </div>
         <div class="form-group">
             <input type="password" 
             class="form-control" 
-            placeholder="Password" 
+            :placeholder="t('password')" 
             v-model="password"
             required="required">
         </div>

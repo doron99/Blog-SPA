@@ -1,22 +1,26 @@
 <template>
 <div class="container  mb-5 mt-5">
-
-<div class="card divComment my-4 " ref="divComment">
-          <h5 class="card-header">
-              Leave a Comment: 
+    <div v-if="!isLoggedIn" class="card divComment my-4 " ref="divComment">
+        <h5 class="card-header">
+            עליך להתחבר על מנת להגיב
+        </h5>
+    </div>
+    <div else class="card divComment my-4 " ref="divComment">
+              <h5 class="card-header">
+                Leave a Comment: 
               </h5>
               <h6 class="card-header" v-if="comment.commentParentId != null">
                   reply to: {{replyAuthor}}
                   <button  @click="cancelReply()">X</button>
               </h6>
-          <div class="card-body">
-            <form @submit.prevent="createComment()">
-              <div class="form-group">
-                <textarea v-model="comment.content" class="form-control" rows="3"></textarea>
+              <div class="card-body">
+                <form @submit.prevent="createComment()">
+                <div class="form-group">
+                    <textarea v-model="comment.content" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-          </div>
         </div>
 
     <div v-if="tree.length > 0" class="card">
@@ -37,7 +41,7 @@
                                     </div>
                                     <div class="col-4">
                                         <div class="pull-right reply"> 
-                                            <button class="btn-link" @click="replyTo(comment)">
+                                            <button v-if="isLoggedIn" class="btn-link" @click="replyTo(comment)">
                                                 <span><i class="fa fa-reply"></i> reply</span>
                                             </button> 
                                         </div>
@@ -77,7 +81,7 @@
 
 <script>
     import {useI18n} from 'vue-i18n'
-
+    import store from '../../store'
     import _service from '../../_services/_service.js'
     export default{
          setup(){
@@ -95,6 +99,11 @@
                 replyAuthor:'',
                 tree:[],
                 list:this.comments
+            }
+        },
+        computed:{
+            isLoggedIn(){
+                return store.getters.isLoggedIn;
             }
         },
         created(){

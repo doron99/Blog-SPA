@@ -5,8 +5,8 @@
       <section class="text-center mt-4">
         <!-- <h4 class="mb-5"><strong>Latest posts</strong></h4> -->
 
-        <div class="row">
-          <div v-for="(post) in posts" :key="post.postId"  class="col-lg-6 col-md-12 mb-4">
+        <div v-if="posts.length > 0" class="row">
+          <div  v-for="(post) in posts" :key="post.postId"  class="col-lg-6 col-md-12 mb-4">
             <div class="card">
               <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
                 <img :src="post.coverImagePath 
@@ -21,7 +21,7 @@
                 <p class="card-text">
                   {{post.excerpt}}
                 </p>
-                <router-link class="btn btn-primary" :to="'/posts/'+post.postId">Read</router-link>
+                <router-link class="btn btn-primary" :to="'/posts/'+post.postId">{{t('read')}}</router-link>
                
               </div>
             </div>
@@ -32,24 +32,18 @@
          
         </div>
       </section>
-      <!--Section: Content-->
-
+ 
       <!-- Pagination -->
-      <nav class="my-4" aria-label="...">
-        <ul class="pagination pagination-circle justify-content-center">
-          <li class="page-item">
-            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item active" aria-current="page">
-            <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#">Next</a>
-          </li>
-        </ul>
-      </nav>
+      <div class="d-flex justify-content-center mb-3">
+                <pagination  
+                    :totalPages="totalPages"
+                    :currPage="currPage"
+                    :maxVisibleButtons="maxVisibleButtons"
+                    @pagechanged="onPageChange($event)">
+                </pagination>
+        </div>
+     
+   
     </div>
  
  
@@ -57,16 +51,23 @@
 </template>
 <script>
     import {useI18n} from 'vue-i18n'
-
+    import Pagination from '../General/Pagination'
     import _service from '../../_services/_service'
     export default{
+      components:{
+        Pagination
+      },
        setup(){
           const {t,locale} = useI18n();
           return  {t,locale} 
         },
         data(){
             return{
-                posts:[]
+                posts:[],
+                currPage:null,
+                itemsPerPage:null,
+                TotalPages:1,
+                maxVisibleButtons:3,
             }
         },
         created(){
@@ -76,21 +77,34 @@
             //     return  process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
         },
         mounted(){
-            this.$store.commit('setLoading',true)
-
-            _service.getPosts()
-            .then(res => {
-              this.posts = res.data; 
-              console.log(this.posts);
-
-
-            }).catch(err => {
-              console.log(err)
-            }).then(() => {
-                this.$store.commit('setLoading',false)
-            })
+            this.getPosts()
         },
         methods:{
+          getPosts(){
+              let data = {
+                currPage:this.currPage,
+                itemsPerPage:this.itemsPerPage
+              }
+              this.$store.commit('setLoading',true)
+              _service.getPosts(data)
+              .then(res => {
+                this.posts = res.data.data; 
+                this.currPage = res.data.currPage;
+                this.itemsPerPage = res.data.itemsPerPage;
+                this.totalPages = res.data.totalPages;
+                console.log(this.posts);
+              }).catch(err => {
+                console.log(err)
+              }).then(() => {
+                  this.$store.commit('setLoading',false)
+              })
+          },
+          onPageChange(event){
+                this.currPage=event
+                console.log('res:',event,this.itemsPerPage)
+                this.$router.push(`/posts?currPage=${this.currPage}&itemsPerPage=${this.itemsPerPage}`)
+                this.getPosts()
+            },
           getImg(img){
             return process.env.VUE_APP_ROOT_URL + '/data/posts/' + img
           }

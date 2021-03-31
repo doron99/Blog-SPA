@@ -1,5 +1,5 @@
 <template>
-   <div class="col-md-4">
+   <div class="col-md-4 order-s">
 
         <!-- Search Widget -->
         <div class="card my-4">
@@ -70,4 +70,12 @@
     } 
 </script>
 <style>
+
+
+@media screen and (max-width: 767px) {
+  .order-s{
+    order:999
+}
+}
+
 </style>
