@@ -89,7 +89,6 @@ export default {
       }
   },
   created(){
-      console.log('this.currPage: ' +this.currPage)
   },
   computed: {
         firstPage(){ return this.currPage === 1},
@@ -128,7 +127,6 @@ export default {
             this.$emit('pagechanged', this.currPage - 1);
         },
         onClickPage(page) {
-            console.log(page);
             this.$emit('pagechanged', page);
         },
         onClickNextPage() {

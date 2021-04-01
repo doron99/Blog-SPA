@@ -16,6 +16,11 @@ function dateFormat(value){
 //   +("00" + date.getSeconds()).slice(-2);
     return dateStr
 }
+function PlaceholderImg(){
+  return  process.env.VUE_APP_DEFAULT_IMG ;
+  //process.env.NODE_ENV == 'development' ? 
+    //            require('@/assets/placeholder.jpg') : 'images/placeholder.jpg'
+}
 
 
-export {logIn,dateFormat}
+export {logIn,dateFormat,PlaceholderImg}

@@ -52,15 +52,14 @@ export default {
             _service.login(formData)
             .then(res => {
                 this.$toast.success('Logged In Successfully');
-                console.log(res.data);
                 this.$store.commit('setToken',{
                     token:res.data.token,
                     expiration:res.data.expiration,
-                    uemail:res.data.uemail});
+                    uemail:res.data.uemail,
+                    uid:res.data.uid});
                 this.$router.replace({ path: "Home" });
             }).catch(err => {
                 this.$toast.error('message string');
-                console.log(err);
 
             })
         }

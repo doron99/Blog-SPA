@@ -23,7 +23,7 @@
         <hr>
 
         <!-- Preview Image  http://placehold.it/900x300-->
-        <img class="img-fluid rounded"  :src="img || require('@/assets/placeholder.jpg')" alt="">
+        <img class="img-fluid rounded"  :src="img || getPlaceHolder" alt="">
 
         <hr>
 
@@ -72,6 +72,9 @@ export default{
         computed:{
             isLoggedIn(){
                 return store.getters.isLoggedIn;
+            },
+            getPlaceHolder(){
+                return process.env.VUE_APP_DEFAULT_IMG;
             }
             //     return  process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
         },
@@ -85,7 +88,6 @@ export default{
                 let self = this;
                 _service.getPost(this.postId)
                 .then(res => {
-                    console.log(res.data);
                     self.post = res.data;
                     if(this.post.coverImagePath)
                         self.img = process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
@@ -98,10 +100,7 @@ export default{
                 console.log('route', this.$route.params.id);
             },
             dateFormat(value){
-                 console.log('value:' + value)
                  let x = dateFormat(value);
-                 console.log('value:' + x)
-
                  return x
              }
             

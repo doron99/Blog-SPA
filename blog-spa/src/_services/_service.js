@@ -1,4 +1,4 @@
-
+// eslint-disable-next-line no-unused-vars
 import axios from 'axios'
 //import store from '../store'
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -29,8 +29,15 @@ export default {
   async UpdatePost(id,formData){
     return await axios.put(`/posts/${id}`,formData,{ headers:  { 'Authorization': `Bearer ${localStorage.getItem('token')}`}});
   },
-  async createComment(id,formData){
+  async setPostVisible(id,flag){
+    return await axios.patch(`/posts/${id}`,[
+      {"op":"replace",
+      "path":"/Public",
+      "value":flag}
+    ],{ headers:  { 'Authorization': `Bearer ${localStorage.getItem('token')}`}});
+  },
 
+  async createComment(id,formData){
     return await axios.post(`/posts/${id}/comments`,formData,{ headers:  { 'Authorization': `Bearer ${localStorage.getItem('token')}`}});
   },
   async getComments(id){

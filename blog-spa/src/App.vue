@@ -41,7 +41,6 @@ export default {
   computed: {
       showAside() {
         let path = this.$route.path;
-        console.log(path.indexOf("/post/"));
         if(path == "/posts" || path.indexOf("/posts/") !== -1) {
           return true
         } else {
@@ -57,7 +56,7 @@ export default {
 
     },
     mounted(){
-      console.log('process.env.NODE_ENV:' +process.env.NODE_ENV)
+      //console.log('process.env.NODE_ENV:' +process.env.NODE_ENV)
     }
 }
 </script>

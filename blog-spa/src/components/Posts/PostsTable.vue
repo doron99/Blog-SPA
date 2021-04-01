@@ -9,13 +9,34 @@
         <th>{{t('shortdesc')}}</th>
         <th>{{t('enter')}}</th>
         <th>{{t('edit')}}</th>
+        <th></th>
     </tr>
         
-        <tr v-for="post in posts" :key="post">
-        <td data-th="id">{{post.title}}</td>
-        <td :data-th="t('shortdesc')">{{post.excerpt}}</td>
-        <td :data-th="t('enter')"><router-link :to="'/posts/'+post.postId" class="btn btn-success d-inline">{{t('enter')}}</router-link></td>
-        <td :data-th="t('edit')"><router-link :to="'/create-post/'+post.postId" class="btn btn-info d-inline">{{t('edit')}}</router-link></td>
+        <tr v-for="(post,index) in posts" :key="post" :index="index">
+            <td data-th="id">{{post.title}}</td>
+            <td :data-th="t('shortdesc')">{{post.excerpt}}</td>
+            <td :data-th="t('enter')">
+                <router-link 
+                    :to="'/posts/'+post.postId" 
+                    class="btn btn-success d-inline">
+                    {{t('enter')}}
+                </router-link>
+                </td>
+            <td :data-th="t('edit')">
+                <router-link 
+                v-if="uid == post.authorId" 
+                :to="'/create-post/'+post.postId" 
+                class="btn btn-info d-inline">
+                {{t('edit')}}
+                </router-link>
+            </td>
+            <td>
+                <button v-if="uid == post.authorId"  
+                    @click.prevent="setVisible(post,index)" 
+                    :class="post.public ? 'btn btn-danger btn-sm' : 'btn btn-warning btn-sm'">
+                    {{post.public ? 'הסתר פוסט':'הצג פוסט'}}
+                </button>
+            </td>
         </tr>
     </table>
 
@@ -33,9 +54,11 @@
     
 </template>
 <script>
+      // eslint-disable-next-line no-unused-vars
       import Pagination from '../General/Pagination'
       import {useI18n} from 'vue-i18n'
       import _service from '../../_services/_service'
+      import store from '../../store'
     export default{
         components:{
             Pagination
@@ -56,16 +79,33 @@
         created(){
         },
         computed:{
+            uid(){
+                return store.getters.uid; 
+            }
             //     return  process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
         },
         mounted(){
             this.getPosts()
         },
         methods:{
+            setVisible(post,index){
+                let _public = post.public;
+                let self = this;
+                _service.setPostVisible(post.postId,!_public)
+                .then(res => {
+                    self.posts[index].public = !_public;
+                }).catch(err =>{
+                    this.$toast.error('error occour');
+                }).then(res => {
+                    console.log(res);
+
+                })
+            },
             getPosts(){
               let data = {
                 currPage:this.currPage,
-                itemsPerPage:this.itemsPerPage
+                itemsPerPage:this.itemsPerPage,
+                mode:'manager'
               }
               this.$store.commit('setLoading',true)
               _service.getPosts(data)
@@ -74,16 +114,14 @@
                 this.currPage = res.data.currPage;
                 this.itemsPerPage = res.data.itemsPerPage;
                 this.totalPages = res.data.totalPages;
-                console.log(this.posts);
               }).catch(err => {
-                console.log(err)
+                this.$toast.error('error occour');
               }).then(() => {
                   this.$store.commit('setLoading',false)
               })
           },
           onPageChange(event){
                 this.currPage=event
-                console.log('res:',event,this.itemsPerPage)
                 this.$router.push(`/posts-manage?currPage=${this.currPage}&itemsPerPage=${this.itemsPerPage}`)
                 this.getPosts()
             },

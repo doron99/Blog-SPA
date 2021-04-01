@@ -11,7 +11,7 @@
               <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
                 <img :src="post.coverImagePath 
                 ? getImg(post.coverImagePath): 
-                require('@/assets/placeholder.jpg')" class="img-fluid" style="height:235px" />
+                getPlaceHolder" class="img-fluid" style="height:235px" />
                 <a href="#!">
                   <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
                 </a>
@@ -73,7 +73,9 @@
         created(){
         },
         computed:{
-            
+            getPlaceHolder(){
+                return process.env.VUE_APP_DEFAULT_IMG;
+            }
             //     return  process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
         },
         mounted(){
@@ -92,16 +94,15 @@
                 this.currPage = res.data.currPage;
                 this.itemsPerPage = res.data.itemsPerPage;
                 this.totalPages = res.data.totalPages;
-                console.log(this.posts);
               }).catch(err => {
-                console.log(err)
+                this.$toast.error('error occour');
               }).then(() => {
                   this.$store.commit('setLoading',false)
               })
           },
           onPageChange(event){
                 this.currPage=event
-                console.log('res:',event,this.itemsPerPage)
+                //console.log('res:',event,this.itemsPerPage)
                 this.$router.push(`/posts?currPage=${this.currPage}&itemsPerPage=${this.itemsPerPage}`)
                 this.getPosts()
             },

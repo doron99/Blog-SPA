@@ -68,14 +68,12 @@
         methods:{
             register(){
                 let formData = this.user;
-                console.log(formData);
                 _service.register(formData)
                 .then(() => {
                     this.$toast.success('registered Successfully');
                     this.$router.replace({ path: "/login" });
                 }).catch(err => {
                     this.$toast.error('error occour');
-                    console.log(err);
                 })
             }
         }

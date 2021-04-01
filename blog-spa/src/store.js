@@ -10,7 +10,9 @@ const store = createStore({
           token: '',
           expiration: Date.now(),
           email:'',
-          isLoading:false
+          uid:'',
+          isLoading:false,
+          
        }
     },
     mutations: {
@@ -18,8 +20,10 @@ const store = createStore({
             localStorage.setItem('token',payload.token);
             localStorage.setItem('expiration',payload.expiration);
             localStorage.setItem('email',payload.uemail);
+            localStorage.setItem('uid',payload.uid);
 
             state.token = payload.token;
+            state.uid = payload.uid;
             state.expiration = new Date(payload.expiration);
             state.email = payload.uemail;
 
@@ -30,29 +34,37 @@ const store = createStore({
             const token = localStorage.getItem('token');
             const expiration = localStorage.getItem('expiration');
             const email = localStorage.getItem('email');
+            const uid = localStorage.getItem('uid');
 
             if(token && (new Date(expiration) > Date.now())){
                 state.token = token;
                 state.expiration = expiration;
                 state.email = email;
-                console.log('login successfully')
+                state.uid = uid;
             }else{
                 state.token = '';
                 state.expiration = new Date();
                 state.email = ''
+                state.uid = '';
+
+                localStorage.removeItem('uid');
                 localStorage.removeItem('token');
                 localStorage.removeItem('expiration');
                 localStorage.removeItem('email');
-                console.log('login fail and logout')
-
             }
             
         },
         logout(state) {
             state.token = '';
             state.expiration = new Date();
+            state.email = ''
+            state.uid = '';
+
             localStorage.removeItem('token');
             localStorage.removeItem('expiration');
+            localStorage.removeItem('uid');
+            localStorage.removeItem('email');
+
         },
         setLoading(state,payload){
             state.isLoading = payload;
@@ -71,6 +83,9 @@ const store = createStore({
         },
         getToken(state){
             return state.token;
+        },
+        uid(state){
+            return state.uid;
         }
     }
     

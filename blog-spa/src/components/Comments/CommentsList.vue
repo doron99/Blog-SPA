@@ -5,7 +5,7 @@
             עליך להתחבר על מנת להגיב
         </h5>
     </div>
-    <div else class="card divComment my-4 " ref="divComment">
+    <div v-else class="card divComment my-4 " ref="divComment">
               <h5 class="card-header">
                 Leave a Comment: 
               </h5>
@@ -33,7 +33,8 @@
                             v-for="comment in tree" :key="comment" 
                             class="media"  
                             :class="comment.children.length === 0 ? 'mb-4' : ''"> 
-                            <img class="mr-3 rounded-circle" alt="Bootstrap Media Preview" :src="require('@/assets/placeholder.jpg')" />
+                            <img class="mr-3 rounded-circle" alt="Bootstrap Media Preview" 
+                            :src="getPlaceHolder" />
                             <div class="media-body">
                                 <div class="row">
                                     <div class="col-8 d-flex">
@@ -52,8 +53,8 @@
                                 <div v-for="child in comment.children" :key="child" class="media mt-4 mb-4"> 
                                     <a class="pr-3" href="#">
                                         <img class="rounded-circle" 
-                                        alt="Bootstrap Media Another Preview" 
-                                        :src="require('@/assets/placeholder.jpg')" />
+                                        alt="" 
+                                        :src="getPlaceHolder" />
                                     </a>
                                 
                                     <div class="media-body">
@@ -104,9 +105,13 @@
         computed:{
             isLoggedIn(){
                 return store.getters.isLoggedIn;
+            },
+            getPlaceHolder(){
+                return process.env.VUE_APP_DEFAULT_IMG;
             }
         },
         created(){
+            console.log(process.env.VUE_APP_DEFAULT_IMG)
             this.comment.postId = this.postId;
             _service.getComments(this.postId)
             .then(res => {

@@ -1,6 +1,11 @@
 <template>
-<div class="container text-right" style="direction:rtl;">
- <div class="card"  >
+<div class="container text-right mt-2 mb-2" style="direction:rtl;">
+    <div v-if="!isMyPost && post.postId != null" class="card divComment my-4 " ref="divComment">
+        <h5 class="card-header">
+            אינך יכול לשנות פוסט שאינו שלך.
+        </h5>
+    </div>
+    <div v-if="isMyPost || post.postId == null" class="card mt-2 mb-2"  >
              <div class="card-body">
                 <h5 class="card-title">{{post.postId? t('edit') : t('add')}}</h5>
                 <div class="row">
@@ -34,10 +39,10 @@
                 </div>
              </div>
              <div class="card-footer">
-                 <button @click.prevent="isUpdate? Update() :Create()">{{isUpdate? t('update') : t('add')}}</button>
+                 <button @click.prevent="post.postId? Update() :Create()">{{post.postId? t('update') : t('add')}}</button>
              </div>
         </div>
-        <div class="mt-4">
+        <div v-if="isMyPost || post.postId == null" class="mt-4">
             <input
                 ref="fileInput"
                 type="file"
@@ -60,7 +65,7 @@
 </template>
 <script>
       import {useI18n} from 'vue-i18n'
-
+    import store from '../../store'
    import DocumentEditor from '@ckeditor/ckeditor5-build-decoupled-document';
     import _service from '../../_services/_service'
     export default{
@@ -72,6 +77,7 @@
             return{
                 editor: DocumentEditor,
                 isUpdate:false,
+                authorId:null,
                 post:{
                     postId:null,
                     title:"",
@@ -146,33 +152,69 @@
         },
         mounted(){
             this.editor.contentsLangDirection = 'rtl';
-            if(!isNaN(this.$route.params.id)){
-                this.isUpdate = true;
-                this.getPost(this.$route.params.id);
+            if(!isNaN(this.$route.params.id))
+                this.onLoad(true);
+            else
+                this.onLoad(false);
+                
+        },
+        computed:{
+            isNewPost(){
+                return !isNaN(this.$route.params.id) ? true : false;
+            },
+            isMyPost(){
+                console.log('this.post.authorId: ' + this.authorId)
+                console.log('store.getters.uid: ' + store.getters.uid)
+                return store.getters.uid == this.authorId ;
             }
-            console.log('mounted')
+        },
+        watch:{
+            isNewPost(){
+                this.onLoad(this.isNewPost);
+            }
         },
         methods:{
-            Create(){
-                _service.createPost(this.post)
-                .then(res => {
-                    this.$toast.success('message string');
-                    this.$router.push({ path: `/create-post/${res.data.postId}` }) 
-                    this.getPost(res.data.postId);
-                
-                }).catch(err => {
-                    this.$toast.error('message string');
-                    console.log(err);
-                })
+            onLoad(flag){
+                if(!flag){
+                    this.authorId = null;
+                    this.post.isUpdate = false;
+                    this.post.postId = null;
+                    this.post.title = "";
+                    this.post.excerpt = "";
+                    this.post.content = "";
+                    this.post.created = null;
+                    this.post.coverImagePath = "";
+                }else{
+                    this.isUpdate = true;
+                    this.getPost(this.$route.params.id);
+                }
+            },
+            async Create(){
+                let formData = new FormData();
+                formData.append('image', this.$refs.fileInput.files[0]);
+                this.$store.commit('setLoading',true)
+                let promise1 = await _service.createPost(this.post).then(res => res.data.postId);
+                //let promise2 = promise1.then()
+                if(!isNaN(promise1) && !!this.$refs.fileInput.files[0]){
+                    await _service.upload(promise1,formData)
+                    .then(() => {
+                        this.$toast.success("img uploaded");
+                        this.$store.commit('setLoading',false);
+                        this.$router.replace(`/posts/${promise1}`);
+
+                    }).catch(err => {
+                        this.$toast.error(err.response.data);
+                    })
+                }
+                this.$router.replace(`/posts/${promise1}`);
+               
             },
             Update(){
                 _service.UpdatePost(this.post.postId,this.post)
                 .then(res => {
                     this.$toast.success('updated successfully');
-                    console.log(res);
                 }).catch(err =>{
-                    this.$toast.error('problem occour');
-                    console.log(err)
+                    this.$toast.error(err.response.data)
                 })
             },
             onReady(editor ){
@@ -187,9 +229,9 @@
             },
             async getPost(id){
                 this.$store.commit('setLoading',true)
-                //let self = this;
                 await _service.getPost(id)
                 .then(res => {
+                    this.authorId = res.data.authorId;
                     this.post.postId=res.data.postId
                     this.post.title=res.data.title
                     this.post.excerpt=res.data.excerpt
@@ -198,8 +240,7 @@
                     this.post.coverImagePath=res.data.coverImagePath
                     this.img = process.env.VUE_APP_ROOT_URL + '/data/posts/' + this.post.coverImagePath
                 }).catch(err => {
-                    console.log(err);
-
+                    this.$toast.error('problem occour');
                 }).then(()=>{this.$store.commit('setLoading',false)})
             },
             selectImage () {
@@ -227,11 +268,9 @@
                     this.$store.commit('setLoading',true)
                     _service.upload(this.post.postId,formData )
                     .then(res => {
-                        console.log(res.data);
                         this.$toast.success('successfully uploaded');
                     }).catch(err =>{
-                        console.log(err);
-                        this.$toast.error('upload failed');
+                        this.$toast.error(err.response.data)
                     }).then(() => this.$store.commit('setLoading',false))
                 }
             }
