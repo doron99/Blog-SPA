@@ -97,7 +97,6 @@
                 }).catch(err =>{
                     this.$toast.error('error occour');
                 }).then(res => {
-                    console.log(res);
 
                 })
             },

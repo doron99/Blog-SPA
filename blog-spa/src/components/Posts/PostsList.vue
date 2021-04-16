@@ -17,12 +17,27 @@
                 </a>
               </div>
               <div class="card-body">
+                <div class="sub-header">
+                      <div class="sub-header-in-left">
+                        {{dateFormat(post.created)}}
+                      </div>
+                      <div class="sub-header-in-right">
+                        {{post.author.ufname + ' ' + post.author.ulname}}
+                      </div>
+                </div>
                 <h5 class="card-title">{{post.title}}</h5>
                 <p class="card-text">
                   {{post.excerpt}}
                 </p>
                 <router-link class="btn btn-primary" :to="'/posts/'+post.postId">{{t('read')}}</router-link>
                
+              </div>
+              <div class="card-footer">
+                <div style="display:flex;">
+                  <div>
+
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -50,6 +65,7 @@
 
 </template>
 <script>
+    import {dateFormat} from '../../js/helper2.js'
     import {useI18n} from 'vue-i18n'
     import Pagination from '../General/Pagination'
     import _service from '../../_services/_service'
@@ -82,6 +98,10 @@
             this.getPosts()
         },
         methods:{
+          dateFormat(value){
+                 let x = dateFormat(value);
+                 return x
+             },
           getPosts(){
               let data = {
                 currPage:this.currPage,
@@ -102,7 +122,6 @@
           },
           onPageChange(event){
                 this.currPage=event
-                //console.log('res:',event,this.itemsPerPage)
                 this.$router.push(`/posts?currPage=${this.currPage}&itemsPerPage=${this.itemsPerPage}`)
                 this.getPosts()
             },
@@ -112,3 +131,27 @@
         }
     }
 </script>
+<style scoped>
+  .sub-header{
+    border-radius: 5px;
+    padding-bottom: 5px;
+    margin: 3px 8px;
+    font-size: 16px;
+    color: rgb(90, 173, 239);
+    font-weight: 600;
+    overflow: auto;
+    font-size: 12px;
+  }
+  .sub-header-in-left{
+    float: left; 
+    width: 50%; 
+    text-align: left; 
+    position: relative;
+  }
+  .sub-header-in-right{
+    float: right; 
+    width: 50%; 
+    text-align: right; 
+    position: relative;
+  }
+</style>

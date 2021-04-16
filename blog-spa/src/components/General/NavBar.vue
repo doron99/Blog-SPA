@@ -16,19 +16,41 @@
         
             <li class="nav-item">
                 <router-link class="nav-link" to="/posts" active-class="active">{{t('posts')}}</router-link>
-
             </li>
             <li v-show="isLoggedIn" class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" 
+                href="#" 
+                id="navbarDropdown" 
+                role="button"
+                data-toggle="dropdown" 
+                aria-haspopup="true" 
+                aria-expanded="false">
                 {{getEmail}}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <router-link class="dropdown-item" to="/create-post" active-class="active">create post</router-link>
                 <router-link class="dropdown-item" to="/posts-manage" >manage posts</router-link>
+                 <router-link class="dropdown-item" :to="'/user-details/'+UID" active-class="active">פרטי משתמש</router-link>
 
               </div>
             </li>
+            <li v-show="isAdmin" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" 
+                href="#" 
+                id="navbarDropdown1" 
+                role="button" 
+                data-toggle="dropdown" 
+                aria-haspopup="true" 
+                aria-expanded="false">
+                Admin
+              </a>
 
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
+                <router-link class="dropdown-item" to="/admin" >ניהול כללי</router-link>
+                <router-link class="dropdown-item" to="/admin/users" >ניהול משתמשים</router-link>
+              </div>
+               
+            </li>
         </ul>
         <ul class="navbar-nav mr-auto">
             <li v-show="!isLoggedIn" class="nav-item">
@@ -62,15 +84,20 @@ import {useI18n} from 'vue-i18n'
             }
         },
         mounted(){
-              //console.log(this.$helpers.isLoggedIn());
         },
         computed:{
           isLoggedIn(){
             return store.getters.isLoggedIn;
           },getEmail(){
             return store.getters.getEmail;
-          }
+          },isAdmin(){
+            return store.getters.isAdmin;
+          },UID(){
+                return this.$store.getters.uid;
+            }
+
         },
+         
         methods: {
           toggleNavbar() {
             this.showCenterClass = !this.showCenterClass;
