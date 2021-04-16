@@ -7,6 +7,10 @@ import PostsList from './components/Posts/PostsList.vue'
 import Post from './components/Posts/Post.vue'
 import CreatePost from './components/Posts/CreatePost.vue'
 import PostsTable from './components/Posts/PostsTable.vue'
+import Admin from './components/Admin/Admin.vue'
+import AdminUsers from './components/Admin/AdminUsers.vue'
+import AdminAddUserModal from './components/Admin/AdminAddUserModal.vue'
+import AdminUserModalContainer from './components/Admin/AdminUserModalContainer.vue'
 
 import store from './store'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -18,12 +22,21 @@ const router = createRouter({
     {path: '/register',component: Register,meta:{requireUnauth:true}},
     {path: '/posts/:id',component: Post},
     {path: '/posts',component: PostsList},
+    {path: '/user-details/:id',component: AdminUserModalContainer,meta:{requireAuth:true}},
+
     {path: '/create-post/:id',component: CreatePost,meta:{requireAuth:true}},
     {path: '/create-post',component: CreatePost,meta:{requireAuth:true}},
     {path: '/posts-manage',component: PostsTable,meta:{requireAuth:true}},
+    {path: '/admin', component:Admin,meta:{requireAuth:true},
+      children:[
+        {path: 'users/:id', component:AdminUserModalContainer},
+        {path: 'users', component:AdminUsers},
+        {path: 'add-user', component:AdminAddUserModal},
 
+      ]},
     {path: '',component: Home},
     {path: "/:catchAll(.*)",component: Home},
+    
    
 ]});
 

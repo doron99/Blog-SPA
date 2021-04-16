@@ -9,6 +9,8 @@ import CKEditor from '@ckeditor/ckeditor5-vue';
 //axios
 import axios from 'axios';
 axios.defaults.baseURL = `${process.env.VUE_APP_ROOT_URL}/api/`
+axios.defaults.headers.post["Content-Type"] = "application/json";
+
 
 
 const reqInterceptor = axios.interceptors.request.use(config => {
@@ -34,10 +36,16 @@ const messages = {
 const i18n = createI18n({
   locale: 'he',
   messages,
+  fallbackWarn: false,
+  missingWarn: false,
+  disableNoTranslationWarning :true
 });
 
 import 'bootstrap-v4-rtl'
 import 'bootstrap-v4-rtl/dist/css/bootstrap.min.css'
+
+import '@fortawesome/fontawesome-free/css/all.css'
+import '@fortawesome/fontawesome-free/js/all.js'
 
 import router from './routes'
 import store from './store'

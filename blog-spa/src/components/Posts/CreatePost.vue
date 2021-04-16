@@ -148,7 +148,6 @@
             }
         },
         created(){
-            console.log('created')
         },
         mounted(){
             this.editor.contentsLangDirection = 'rtl';
@@ -163,8 +162,6 @@
                 return !isNaN(this.$route.params.id) ? true : false;
             },
             isMyPost(){
-                console.log('this.post.authorId: ' + this.authorId)
-                console.log('store.getters.uid: ' + store.getters.uid)
                 return store.getters.uid == this.authorId ;
             }
         },

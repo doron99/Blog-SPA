@@ -1,8 +1,17 @@
 const TerserPlugin = require('terser-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = {
     outputDir : '../../Blog-API/Blog-API/wwwroot/ClientApp',
     configureWebpack: config => {
+      plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jquery: 'jquery',
+          'window.jQuery': 'jquery',
+          jQuery: 'jquery'
+        })
+      ],
       config.optimization = {
         minimize: true,
         minimizer: [
