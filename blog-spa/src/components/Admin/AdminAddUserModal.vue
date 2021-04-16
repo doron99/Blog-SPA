@@ -132,7 +132,10 @@ export default {
             }
             _service.register(user)
             .then(x => {
+                console.log(x.data)
                 this.$toast.success("added successfully");
+                this.$router.replace(`/user-details/${x.data.uid}`);
+                
             })
             .catch(err => {
                 if(err.response.status == 400 && err.response.data)

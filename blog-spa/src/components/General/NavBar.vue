@@ -28,8 +28,8 @@
                 {{getEmail}}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <router-link class="dropdown-item" to="/create-post" active-class="active">create post</router-link>
-                <router-link class="dropdown-item" to="/posts-manage" >manage posts</router-link>
+                <router-link class="dropdown-item" to="/create-post" active-class="active">צור פוסט</router-link>
+                <router-link class="dropdown-item" to="/posts-manage" >ניהול פוסטים</router-link>
                  <router-link class="dropdown-item" :to="'/user-details/'+UID" active-class="active">פרטי משתמש</router-link>
 
               </div>
